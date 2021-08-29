@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -21,6 +23,10 @@ public class MainActivity extends AppCompatActivity {
     private Question currQuestion;
     private int time;
     private int scor;
+
+    //Skip pregunta
+    private int pressTime;
+    private boolean isPressing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,13 +54,10 @@ public class MainActivity extends AppCompatActivity {
                 while(time > 0) {
                 try {
                     time --;
-
                     runOnUiThread(
                         () -> {
                             timer.setText("Tiempo: "+ time);
                         });
-
-
                     Thread.sleep(1000);
                   }catch (InterruptedException e){
                     Log.e("ERROR", e.toString());
@@ -70,6 +73,40 @@ public class MainActivity extends AppCompatActivity {
                     checkAnswer(); //llamo el método
             }
         );
+
+
+        //Skip pregunta
+        question.setOnTouchListener(
+                (view, event) -> {
+                    switch (event.getAction()){
+                        case MotionEvent.ACTION_DOWN:
+                            isPressing = true;
+                            new Thread(()->{
+                                pressTime = 0;
+                                while(pressTime <1500){
+                                    try {
+                                        Thread.sleep(150);
+                                        pressTime+=150;
+                                        if(isPressing){
+                                            return; //Matar el hilo c:
+                                        }
+                                    }catch (InterruptedException e){
+                                    }
+                                }
+                                runOnUiThread(()->{
+                                    Toast.makeText(this, "Pasó el tiempo", Toast.LENGTH_SHORT).show();
+                                    currQuestion = new Question();
+                                    question.setText(currQuestion.getQuestion()); //para poner la pregunta
+                                });
+
+                            }).start();
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            isPressing = false;
+                            break;
+                    }
+                    return true;
+                });
     }
 
     private void generateNewQuestion() {
@@ -83,14 +120,12 @@ public class MainActivity extends AppCompatActivity {
 
         if (answerInt == currQuestion.getAnswer()) {
             Toast.makeText(this, "Correcto", Toast.LENGTH_SHORT).show();
-
             //suma puntaje
             scor += 5;
             score.setText("Puntaje: " + scor);
 
         } else {
             Toast.makeText(this, "Incorrecto", Toast.LENGTH_SHORT).show();
-
             //resta puntaje
             scor -= 4;
             score.setText("Puntaje: " + scor);
