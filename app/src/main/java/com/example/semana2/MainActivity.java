@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
         timer.setText("Tiempo: "+ time); //Incluir el tiempo real
         score.setText("Puntaje: "+scor); //Incluir el puntaje real
 
-
         //Para el timer
         new Thread(
             () -> {
@@ -146,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
         scor=0;
         score.setText("Puntaje:"+ scor);
         time=30;
-        timer.setText(""+time);
+        timer.setText("Tiempo: "+ time);
         answer.setText("");
         tryAgainButton.setVisibility(View.GONE);
 
@@ -154,9 +153,10 @@ public class MainActivity extends AppCompatActivity {
                 () ->{
                     while(time>0){
                         time--;
+                        tryAgainButton.setVisibility(View.GONE);
                         runOnUiThread(
                                 () ->{
-                                    timer.setText(""+time);
+                                    timer.setText("Tiempo: "+ time);
                                 });
                         try {
                             Thread.sleep(1000);
