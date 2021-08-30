@@ -77,8 +77,8 @@ public class MainActivity extends AppCompatActivity {
 
         //Skip pregunta
         question.setOnTouchListener(
-                (view, event) -> {
-                    switch (event.getAction()){
+                (view, motionEvent) -> {
+                    switch (motionEvent.getAction()){
                         case MotionEvent.ACTION_DOWN:
                             isPressing = true;
                             new Thread(()->{
@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
                                     try {
                                         Thread.sleep(150);
                                         pressTime+=150;
-                                        if(isPressing){
+                                        if(!isPressing){
                                             return; //Matar el hilo c:
                                         }
                                     }catch (InterruptedException e){
@@ -95,8 +95,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                                 runOnUiThread(()->{
                                     Toast.makeText(this, "Pasó el tiempo", Toast.LENGTH_SHORT).show();
-                                    currQuestion = new Question();
-                                    question.setText(currQuestion.getQuestion()); //para poner la pregunta
+                                    generateNewQuestion();
                                 });
 
                             }).start();
