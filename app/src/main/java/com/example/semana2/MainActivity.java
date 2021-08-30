@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView question;
     private EditText answer;
     private Button button;
-    private Button buttonTryAgain;
+    private Button tryAgainButton;
     private TextView score;
 
     private Question currQuestion;
@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         question = findViewById(R.id.question);
         answer = findViewById(R.id.answer);
         button = findViewById(R.id.button);
-        buttonTryAgain = findViewById(R.id.buttonTryAgain);
+        tryAgainButton = findViewById(R.id.tryAgainButton);
         score = findViewById(R.id.score);
 
         scor = 0;
@@ -106,8 +106,16 @@ public class MainActivity extends AppCompatActivity {
                     }
                     return true;
                 });
+
+
+        //Intentar de nuevo
+        tryAgainButton.setOnClickListener(
+                (view) -> {
+                    retry();
+                });
     }
 
+    //MÉTODOS
     private void generateNewQuestion() {
         currQuestion = new Question();
         question.setText(currQuestion.getQuestion()); //para poner la pregunta
@@ -131,5 +139,35 @@ public class MainActivity extends AppCompatActivity {
 
         }
         generateNewQuestion();
+    }
+
+    private void retry(){
+        generateNewQuestion();
+        scor=0;
+        score.setText("Puntaje:"+ scor);
+        time=30;
+        timer.setText(""+time);
+        answer.setText("");
+        tryAgainButton.setVisibility(View.GONE);
+
+        new Thread(
+                () ->{
+                    while(time>0){
+                        time--;
+                        runOnUiThread(
+                                () ->{
+                                    timer.setText(""+time);
+                                });
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                        }
+                    }
+                    runOnUiThread(
+                            ()->{
+                                tryAgainButton.setVisibility(View.VISIBLE);
+                            });
+                }
+        ).start();
     }
 }
